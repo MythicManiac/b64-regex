@@ -7,75 +7,84 @@ CHARSET_REVERSE = {v: k for k, v in enumerate(CHARSET)}
 
 Alignment = Literal[0, 2, 4]
 ALL_ALIGNMENTS: Tuple[Literal[0], Literal[2], Literal[4]] = (0, 2, 4)
+REGEX_GROUP_BOUNDARIES = (
+    (CHARSET_REVERSE["a"], CHARSET_REVERSE["z"]),
+    (CHARSET_REVERSE["A"], CHARSET_REVERSE["Z"]),
+    (CHARSET_REVERSE["0"], CHARSET_REVERSE["9"]),
+)
 
 
-def stupid_pow(a: int, b: int) -> int:
+def is_in_group(val: int) -> Optional[Tuple[int, int]]:
+    for (gmin, gmax) in REGEX_GROUP_BOUNDARIES:
+        if gmin <= val <= gmax:
+            return (gmin, gmax)
+    return None
+
+
+class GroupBuilder:
+    current_group: Optional[Tuple[int, int]] = None
+    start: Optional[int] = None
+    end: Optional[int] = None
+
+    def reset_cursor(self) -> Iterable[Tuple[int, int]]:
+        if self.start and self.end:
+            yield (self.start, self.end)
+        self.start = None
+        self.end = None
+        self.current_group = None
+
+    def add(self, current: int) -> Iterable[Tuple[int, int]]:
+        group = is_in_group(current)
+        if group != self.current_group or (self.end and current > self.end + 1):
+            for x in self.reset_cursor():
+                yield x
+
+        if group is None:
+            yield [current, current]
+        else:
+            if self.current_group is None:
+                self.current_group = group
+                self.start = current
+                self.end = current
+            elif current == (self.end + 1):
+                self.end = current
+
+
+def pow_or_zero(a: int, b: int) -> int:
     if b == 0:
         return 0
     return pow(a, b)
 
 
-def as_regex_group(matches: List[str]) -> str:
-    if not matches:
-        return ""
-    as_numbers = sorted(set((CHARSET_REVERSE[x] for x in matches)))
+def escape_chargroup(chargroup: str) -> str:
+    return chargroup.replace("/", "\\/").replace("+", "\\+")
 
-    matchgroups = []
+
+def as_regex_chargroup(characters: List[str]) -> str:
+    if not characters:
+        return ""
+
+    as_numbers = sorted(set((CHARSET_REVERSE[x] for x in characters)))
+    chargroups = []
 
     def add_matchgroup(start: int, end: int):
         if start != end:
-            matchgroups.append(f"{CHARSET[start]}-{CHARSET[end]}")
-        else:
-            matchgroups.append(CHARSET[start])
-
-    group_boundaries = (
-        (CHARSET_REVERSE["a"], CHARSET_REVERSE["z"]),
-        (CHARSET_REVERSE["A"], CHARSET_REVERSE["Z"]),
-        (CHARSET_REVERSE["0"], CHARSET_REVERSE["9"]),
-    )
-
-    def is_in_group(val: int) -> Optional[Tuple[int, int]]:
-        for (gmin, gmax) in group_boundaries:
-            if gmin <= val <= gmax:
-                return (gmin, gmax)
-        return None
-
-    class Cursor:
-        current_group: Optional[Tuple[int, int]] = None
-        start: Optional[int] = None
-        end: Optional[int] = None
-
-        def reset_cursor(self) -> Iterable[Tuple[int, int]]:
-            if self.start and self.end:
-                yield (self.start, self.end)
-            self.start = None
-            self.end = None
-            self.current_group = None
-
-        def record(self, current: int) -> Iterable[Tuple[int, int]]:
-            group = is_in_group(current)
-            if group != self.current_group or (self.end and current > self.end + 1):
-                for x in self.reset_cursor():
-                    yield x
-
-            if group is None:
-                yield [current, current]
+            if end - start > 2:
+                chargroups.append(f"{CHARSET[start]}-{CHARSET[end]}")
             else:
-                if self.current_group is None:
-                    self.current_group = group
-                    self.start = current
-                    self.end = current
-                elif current == (self.end + 1):
-                    self.end = current
+                chargroups.append(CHARSET[start])
+                chargroups.append(CHARSET[end])
+        else:
+            chargroups.append(CHARSET[start])
 
-    cursor = Cursor()
+    builder = GroupBuilder()
     for entry in as_numbers:
-        for x in cursor.record(entry):
+        for x in builder.add(entry):
             add_matchgroup(*x)
-    for x in cursor.reset_cursor():
+    for x in builder.reset_cursor():
         add_matchgroup(*x)
 
-    group = "".join([x.replace("/", "\\/").replace("+", "\\+") for x in matchgroups])
+    group = "".join([escape_chargroup(x) for x in chargroups])
     return f"[{group}]"
 
 
@@ -95,9 +104,9 @@ class SegmentVariant:
 
     def as_regex(self) -> str:
         return (
-            f"{as_regex_group(encode_multi(self.prefixes))}"
+            f"{as_regex_chargroup(encode_multi(self.prefixes))}"
             f"{b64_encode_bits_without_padding(self.middle)}"
-            f"{as_regex_group(encode_multi(self.suffixes))}"
+            f"{as_regex_chargroup(encode_multi(self.suffixes))}"
         )
 
 
@@ -110,11 +119,11 @@ class SegmentVariantGroup:
         return f"(?:{regexed})"
 
 
-class TokenSequence:
+class Segment:
     bits: str
 
-    def __init__(self, bits: str):
-        self.bits = bits
+    def __init__(self, plaintext_bytes: bytes):
+        self.bits = bytes_to_bits(plaintext_bytes)
 
     def with_alignment(self, alignment: Alignment) -> SegmentVariant:
         prefix_padding = alignment
@@ -134,12 +143,12 @@ class TokenSequence:
         assert len(prefix) + len(middle) + len(suffix) == len(self.bits)
 
         padded_prefixes = []
-        for i in range(stupid_pow(2, prefix_padding)):
+        for i in range(pow_or_zero(2, prefix_padding)):
             padding_bits = f"{i:b}".zfill(prefix_padding)
             padded_prefixes.append(f"{padding_bits}{prefix}")
 
         padded_suffixes = []
-        for i in range(stupid_pow(2, suffix_padding)):
+        for i in range(pow_or_zero(2, suffix_padding)):
             padding_bits = f"{i:b}".zfill(suffix_padding)
             padded_suffixes.append(f"{suffix}{padding_bits}")
 

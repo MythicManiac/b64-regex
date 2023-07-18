@@ -3,7 +3,7 @@ from csv import DictWriter
 
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
 from b64_regex.recoder import (
-    TokenSequence,
+    Segment,
     bytes_to_bits,
 )
 
@@ -44,8 +44,8 @@ def main():
     # dump_flags_to_txt("./test.txt")
     # dump_test_flags_to_file("./test.csv")
 
-    start_seq = TokenSequence(bytes_to_bits(b"HTB{"))
-    end_seq = TokenSequence(bytes_to_bits(b"}"))
+    start_seq = Segment(b"HTB{")
+    end_seq = Segment(b"}")
 
     full_regex = (
         "(" f"{start_seq.as_regex()}" "[a-zA-Z0-9\\/\\+]+" f"{end_seq.as_regex()}" ")"
