@@ -76,7 +76,7 @@ def as_regex_group(matches: List[str]) -> str:
         add_matchgroup(*x)
 
     group = "".join([x.replace("/", "\\/").replace("+", "\\+") for x in matchgroups])
-    return f"(?:[{group}])"
+    return f"[{group}]"
 
 
 def encode_multi(entries: List[str]) -> List[str]:

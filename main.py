@@ -48,11 +48,7 @@ def main():
     end_seq = TokenSequence(bytes_to_bits(b"}"))
 
     full_regex = (
-        "("
-        f"(?:{start_seq.as_regex()})"
-        "[a-zA-Z0-9\\/\\+]+"
-        f"(?:{end_seq.as_regex()})"
-        ")"
+        "(" f"{start_seq.as_regex()}" "[a-zA-Z0-9\\/\\+]+" f"{end_seq.as_regex()}" ")"
     )
 
     print(full_regex)
