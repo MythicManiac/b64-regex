@@ -24,7 +24,7 @@ def as_regex_group(matches: List[str]) -> str:
 
     def add_matchgroup(start: int, end: int):
         if start != end:
-            matchgroups.append(f"[{CHARSET[start]}-{CHARSET[end]}]")
+            matchgroups.append(f"{CHARSET[start]}-{CHARSET[end]}")
         else:
             matchgroups.append(CHARSET[start])
 
@@ -75,8 +75,8 @@ def as_regex_group(matches: List[str]) -> str:
     for x in cursor.reset_cursor():
         add_matchgroup(*x)
 
-    group = "|".join([x.replace("/", "\\/").replace("+", "\\+") for x in matchgroups])
-    return f"(?:{group})"
+    group = "".join([x.replace("/", "\\/").replace("+", "\\+") for x in matchgroups])
+    return f"(?:[{group}])"
 
 
 def encode_multi(entries: List[str]) -> List[str]:
