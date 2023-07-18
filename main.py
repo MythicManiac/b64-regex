@@ -55,7 +55,7 @@ def main():
     # print(full_regex)
 
     for x in decode_all_alignments(
-        "aaaaacGF0dGVyblByZWZpeChmb28tYmFyLWNvbnRlbnQpcGF0dGVyblN1ZmZpeA=="
+        "cGF0dGVyblByZWZpeChmb28tYmFyLWNvbnRlbnQpcGF0dGVyblN1ZmZpeA=="
     ):
         print(x)
 
