@@ -1,5 +1,5 @@
 import string
-from typing import Literal, List, Tuple
+from typing import Literal, List, Tuple, Optional, Iterable
 
 CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
 CHARSET_REVERSE = {v: k for k, v in enumerate(CHARSET)}
@@ -18,7 +18,64 @@ def stupid_pow(a: int, b: int) -> int:
 def as_regex_group(matches: List[str]) -> str:
     if not matches:
         return ""
-    group = "|".join([x.replace("/", "\\/").replace("+", "\\+") for x in matches])
+    as_numbers = sorted(set((CHARSET_REVERSE[x] for x in matches)))
+
+    matchgroups = []
+
+    def add_matchgroup(start: int, end: int):
+        if start != end:
+            matchgroups.append(f"[{CHARSET[start]}-{CHARSET[end]}]")
+        else:
+            matchgroups.append(CHARSET[start])
+
+    group_boundaries = (
+        (CHARSET_REVERSE["a"], CHARSET_REVERSE["z"]),
+        (CHARSET_REVERSE["A"], CHARSET_REVERSE["Z"]),
+        (CHARSET_REVERSE["0"], CHARSET_REVERSE["9"]),
+    )
+
+    def is_in_group(val: int) -> Optional[Tuple[int, int]]:
+        for (gmin, gmax) in group_boundaries:
+            if gmin <= val <= gmax:
+                return (gmin, gmax)
+        return None
+
+    class Cursor:
+        current_group: Optional[Tuple[int, int]] = None
+        start: Optional[int] = None
+        end: Optional[int] = None
+
+        def reset_cursor(self) -> Iterable[Tuple[int, int]]:
+            if self.start and self.end:
+                yield (self.start, self.end)
+            self.start = None
+            self.end = None
+            self.current_group = None
+
+        def record(self, current: int) -> Iterable[Tuple[int, int]]:
+            group = is_in_group(current)
+            if group != self.current_group or (self.end and current > self.end + 1):
+                for x in self.reset_cursor():
+                    yield x
+
+            if group is None:
+                yield [current, current]
+            else:
+                if self.current_group is None:
+                    self.current_group = group
+                    self.start = current
+                    self.end = current
+                elif current == (self.end + 1):
+                    self.end = current
+
+    cursor = Cursor()
+    for entry in as_numbers:
+        for x in cursor.record(entry):
+            add_matchgroup(*x)
+    for x in cursor.reset_cursor():
+        add_matchgroup(*x)
+
+    group = "|".join([x.replace("/", "\\/").replace("+", "\\+") for x in matchgroups])
     return f"(?:{group})"
 
 

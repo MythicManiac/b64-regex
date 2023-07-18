@@ -43,31 +43,9 @@ def print_test_flags():
 def main():
     # dump_flags_to_txt("./test.txt")
     # dump_test_flags_to_file("./test.csv")
-    # build_regex()
-    # from base64 import b64encode
-    #
-    # print(b64encode(b"Hello"))
-    # encoded = base64_encode(b"Hello")
-    # print(encoded)
-    # print(base64_decode(encoded))
-
-    # seq = TokenSequence(bytes_to_bits(b"Three days grade school,"))
-    # vars = [b64_encode_bits_without_padding(x) for x in seq.with_all_alignments()]
-    # regx = variants_to_regex(vars)
-    # print(regx)
 
     start_seq = TokenSequence(bytes_to_bits(b"HTB{"))
-
-    # start_variants = [
-    #     b64_encode_bits_without_padding(x) for x in start_seq.with_all_alignments()
-    # ]
-    # start_regex = variants_to_regex(start_variants)
-
     end_seq = TokenSequence(bytes_to_bits(b"}"))
-    # end_variants = [
-    #     b64_encode_bits_without_padding(x) for x in end_seq.with_all_alignments()
-    # ]
-    # end_regex = variants_to_regex(end_variants)
 
     full_regex = (
         "("
