@@ -21,8 +21,7 @@ jobs:
           python -m poetry install
       - name: Run pytest
         run: python -m poetry run pytest --codeblocks --cov --cov-report=xml:coverage.xml --cov-report=term --cov ./b64_regex/
-      - name: Upload coverage to Codecov
-        if: always()
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
