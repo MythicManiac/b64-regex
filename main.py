@@ -3,6 +3,7 @@ from csv import DictWriter
 
 from b64_regex.compiler import make_alignment_variants
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
+from b64_regex.recoder import base64_encode, base64_decode
 
 
 def dump_test_flags_to_file(destination: str):
@@ -34,7 +35,13 @@ def build_regex():
 
 def main():
     # dump_test_flags_to_file("./test.csv")
-    build_regex()
+    # build_regex()
+    from base64 import b64encode
+
+    print(b64encode(b"Hello"))
+    encoded = base64_encode(b"Hello")
+    print(encoded)
+    print(base64_decode(encoded))
 
 
 if __name__ == "__main__":
