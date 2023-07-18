@@ -1,5 +1,3 @@
-from bitarray import bitarray
-
 import string
 
 CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
@@ -12,16 +10,14 @@ def iter_windows(window_size: int, arr):
 
 
 def base64_encode(content: bytes) -> str:
-    ba = bitarray()
-    ba.frombytes(content)
+    bits = "".join([f"{x:08b}" for x in content])
 
-    if padding_bits := 6 - (len(ba) % 6):
-        ba.extend(padding_bits * "0")
+    if padding_bits := 6 - (len(bits) % 6):
+        bits += padding_bits * "0"
 
     result = ""
-    for window in iter_windows(6, ba):
-        window = bitarray(f"00{window.to01()}")
-        result += CHARSET[int.from_bytes(window.tobytes())]
+    for window in iter_windows(6, bits):
+        result += CHARSET[int(window, 2)]
 
     if padding_chars := 4 - (len(result) % 4):
         result += "=" * padding_chars

@@ -1,8 +1,6 @@
 from base64 import b64encode
 from typing import List
 
-from bitarray import bitarray
-
 
 def make_alignment_variants(known: str) -> List[str]:
     if len(known) < 2:

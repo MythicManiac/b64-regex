@@ -10,7 +10,6 @@ packages = [{include = "b64_regex"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 pytest = "^7.4.0"
-bitarray = "^2.7.6"
 
 
 [build-system]
