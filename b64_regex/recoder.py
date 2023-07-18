@@ -1,11 +1,12 @@
 import string
-from typing import Literal, Iterable
+from typing import Literal, Iterable, List, Tuple
 
 CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
 CHARSET_REVERSE = {v: k for k, v in enumerate(CHARSET)}
 
 
 Alignment = Literal[0, 2, 4]
+ALL_ALIGNMENTS: Tuple[Literal[0], Literal[2], Literal[4]] = (0, 2, 4)
 
 
 def stupid_pow(a: int, b: int) -> int:
@@ -14,32 +15,84 @@ def stupid_pow(a: int, b: int) -> int:
     return pow(a, b)
 
 
+def as_regex_group(matches: List[str]) -> str:
+    if not matches:
+        return ""
+    group = "|".join([x.replace("/", "\\/").replace("+", "\\+") for x in matches])
+    return f"({group})"
+
+
+def encode_multi(entries: List[str]) -> List[str]:
+    return [b64_encode_bits_without_padding(x) for x in entries]
+
+
+class SegmentVariant:
+    prefixes: List[str]
+    middle: str
+    suffixes: List[str]
+
+    def __init__(self, prefixes: List[str], middle: str, suffixes: List[str]):
+        self.prefixes = prefixes
+        self.middle = middle
+        self.suffixes = suffixes
+
+    def as_regex(self) -> str:
+        return (
+            f"{as_regex_group(encode_multi(self.prefixes))}"
+            f"{b64_encode_bits_without_padding(self.middle)}"
+            f"{as_regex_group(encode_multi(self.suffixes))}"
+        )
+
+
+class SegmentVariantGroup:
+    def __init__(self, segments: List[SegmentVariant]):
+        self.segments = segments
+
+    def as_regex(self) -> str:
+        regexed = "|".join(x.as_regex() for x in self.segments)
+        return f"({regexed})"
+
+
 class TokenSequence:
     bits: str
 
     def __init__(self, bits: str):
         self.bits = bits
 
-    def with_alignment(self, alignment: Alignment) -> Iterable[str]:
-        prefix_bits = alignment
-        suffix_bits = 6 - ((len(self.bits) + alignment) % 6 or 6)
-        variant_bits = prefix_bits + suffix_bits
+    def with_alignment(self, alignment: Alignment) -> SegmentVariant:
+        prefix_padding = alignment
+        suffix_padding = 6 - ((len(self.bits) + alignment) % 6 or 6)
+        variant_bits = prefix_padding + suffix_padding
         if variant_bits not in (0, 2, 4, 6):
             raise RuntimeError(f"Math doesn't check out: {variant_bits}")
 
-        if variant_bits == 0:
-            yield self.bits
+        prefix_bits = (6 - prefix_padding) % 6
+        prefix = self.bits[:prefix_bits] if prefix_bits else []
 
-        for i in range(stupid_pow(2, variant_bits)):
-            padding_bits = f"{i:b}".zfill(variant_bits)
-            prefix = padding_bits[:prefix_bits]
-            suffix = padding_bits[prefix_bits:]
-            yield f"{prefix}{self.bits}{suffix}"
+        suffix_bits = (6 - suffix_padding) % 6
+        suffix = self.bits[-suffix_bits:] if suffix_bits else []
 
-    def with_all_alignments(self) -> Iterable[str]:
-        for alignment in (0, 2, 4):
-            for entry in self.with_alignment(alignment):
-                yield entry
+        middle = self.bits[prefix_bits : len(self.bits) - suffix_bits]
+
+        assert len(prefix) + len(middle) + len(suffix) == len(self.bits)
+
+        padded_prefixes = []
+        for i in range(stupid_pow(2, prefix_padding)):
+            padding_bits = f"{i:b}".zfill(prefix_padding)
+            padded_prefixes.append(f"{padding_bits}{prefix}")
+
+        padded_suffixes = []
+        for i in range(stupid_pow(2, suffix_padding)):
+            padding_bits = f"{i:b}".zfill(suffix_padding)
+            padded_suffixes.append(f"{suffix}{padding_bits}")
+
+        return SegmentVariant(padded_prefixes, middle, padded_suffixes)
+
+    def with_all_alignments(self) -> SegmentVariantGroup:
+        return SegmentVariantGroup([self.with_alignment(x) for x in ALL_ALIGNMENTS])
+
+    def as_regex(self) -> str:
+        return self.with_all_alignments().as_regex()
 
 
 def iter_windows(window_size: int, arr):

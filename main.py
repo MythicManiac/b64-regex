@@ -1,15 +1,10 @@
 from base64 import b64encode
 from csv import DictWriter
-from typing import List
 
-from b64_regex.compiler import make_alignment_variants
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
 from b64_regex.recoder import (
-    base64_encode,
-    base64_decode,
     TokenSequence,
     bytes_to_bits,
-    b64_encode_bits_without_padding,
 )
 
 
@@ -45,14 +40,6 @@ def print_test_flags():
         print(f"{flag=} | {wrapped=} | {encoded=}")
 
 
-def build_regex():
-    print(make_alignment_variants("HTB{"))
-
-
-def variants_to_regex(variants: List[str]) -> str:
-    return "|".join(variants).replace("/", "\\/").replace("+", "\\+")
-
-
 def main():
     # dump_flags_to_txt("./test.txt")
     # dump_test_flags_to_file("./test.csv")
@@ -70,18 +57,21 @@ def main():
     # print(regx)
 
     start_seq = TokenSequence(bytes_to_bits(b"HTB{"))
-    start_variants = [
-        b64_encode_bits_without_padding(x) for x in start_seq.with_all_alignments()
-    ]
-    start_regex = variants_to_regex(start_variants)
+
+    # start_variants = [
+    #     b64_encode_bits_without_padding(x) for x in start_seq.with_all_alignments()
+    # ]
+    # start_regex = variants_to_regex(start_variants)
 
     end_seq = TokenSequence(bytes_to_bits(b"}"))
-    end_variants = [
-        b64_encode_bits_without_padding(x) for x in end_seq.with_all_alignments()
-    ]
-    end_regex = variants_to_regex(end_variants)
+    # end_variants = [
+    #     b64_encode_bits_without_padding(x) for x in end_seq.with_all_alignments()
+    # ]
+    # end_regex = variants_to_regex(end_variants)
 
-    full_regex = f"({start_regex})" "[a-zA-Z0-9\\/\\+]+" f"({end_regex})"
+    full_regex = (
+        f"({start_seq.as_regex()})" "[a-zA-Z0-9\\/\\+]+" f"({end_seq.as_regex()})"
+    )
 
     print(full_regex)
 
