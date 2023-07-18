@@ -17,6 +17,8 @@ python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-codeblocks = "^0.16.1"
 
 [build-system]
 requires = ["poetry-core"]

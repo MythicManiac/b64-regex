@@ -20,7 +20,7 @@ jobs:
           python -m pip install poetry
           python -m poetry install
       - name: Run pytest
-        run: python -m poetry run pytest --cov --cov-report=xml:coverage.xml --cov-report=term --cov ./ipfs_cid/
+        run: python -m poetry run pytest --codeblocks --cov --cov-report=xml:coverage.xml --cov-report=term --cov ./b64_regex/
       - name: Upload coverage to Codecov
         if: always()
         uses: codecov/codecov-action@v3
