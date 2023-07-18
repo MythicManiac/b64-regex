@@ -70,7 +70,11 @@ def main():
     # end_regex = variants_to_regex(end_variants)
 
     full_regex = (
-        f"({start_seq.as_regex()})" "[a-zA-Z0-9\\/\\+]+" f"({end_seq.as_regex()})"
+        "("
+        f"(?:{start_seq.as_regex()})"
+        "[a-zA-Z0-9\\/\\+]+"
+        f"(?:{end_seq.as_regex()})"
+        ")"
     )
 
     print(full_regex)

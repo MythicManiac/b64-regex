@@ -1,5 +1,5 @@
 import string
-from typing import Literal, Iterable, List, Tuple
+from typing import Literal, List, Tuple
 
 CHARSET = string.ascii_uppercase + string.ascii_lowercase + string.digits + "+/"
 CHARSET_REVERSE = {v: k for k, v in enumerate(CHARSET)}
@@ -19,7 +19,7 @@ def as_regex_group(matches: List[str]) -> str:
     if not matches:
         return ""
     group = "|".join([x.replace("/", "\\/").replace("+", "\\+") for x in matches])
-    return f"({group})"
+    return f"(?:{group})"
 
 
 def encode_multi(entries: List[str]) -> List[str]:
@@ -50,7 +50,7 @@ class SegmentVariantGroup:
 
     def as_regex(self) -> str:
         regexed = "|".join(x.as_regex() for x in self.segments)
-        return f"({regexed})"
+        return f"(?:{regexed})"
 
 
 class TokenSequence:
