@@ -2,7 +2,7 @@ from base64 import b64encode
 from csv import DictWriter
 
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
-from b64_regex.recoder import Segment
+from b64_regex.recoder import Segment, B64_CHARGROUP, decode_all_alignments
 
 
 def dump_test_flags_to_csv(destination: str):
@@ -41,14 +41,25 @@ def main():
     # dump_flags_to_txt("./test.txt")
     # dump_test_flags_to_file("./test.csv")
 
-    start_seq = Segment(b"HTB{")
-    end_seq = Segment(b"}")
+    # start_seq = Segment(b"HTB{")
+    # end_seq = Segment(b"}")
+    #
+    # full_regex = (
+    #     "(" f"{start_seq.as_regex()}" f"{B64_CHARGROUP}+" f"{end_seq.as_regex()}" ")"
+    # )
 
-    full_regex = (
-        "(" f"{start_seq.as_regex()}" "[a-zA-Z0-9\\/\\+]+" f"{end_seq.as_regex()}" ")"
-    )
+    # start_segment = Segment(b"patternPrefix(")
+    # end_segment = Segment(b")patternSuffix")
+    #
+    # full_regex = f"{start_segment.as_regex()}{B64_CHARGROUP}+{end_segment.as_regex()}"
+    # print(full_regex)
 
-    print(full_regex)
+    for x in decode_all_alignments(
+        "aaaaacGF0dGVyblByZWZpeChmb28tYmFyLWNvbnRlbnQpcGF0dGVyblN1ZmZpeA=="
+    ):
+        print(x)
+
+    # print(full_regex)
 
 
 if __name__ == "__main__":

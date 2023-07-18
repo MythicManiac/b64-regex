@@ -13,6 +13,8 @@ REGEX_GROUP_BOUNDARIES = (
     (CHARSET_REVERSE["0"], CHARSET_REVERSE["9"]),
 )
 
+B64_CHARGROUP = "[a-zA-Z0-9\\/\\+]"
+
 
 def is_in_group(val: int) -> Optional[Tuple[int, int]]:
     for (gmin, gmax) in REGEX_GROUP_BOUNDARIES:
@@ -27,7 +29,7 @@ class GroupBuilder:
     end: Optional[int] = None
 
     def reset_cursor(self) -> Iterable[Tuple[int, int]]:
-        if self.start and self.end:
+        if self.start is not None and self.end is not None:
             yield (self.start, self.end)
         self.start = None
         self.end = None
@@ -85,6 +87,8 @@ def as_regex_chargroup(characters: List[str]) -> str:
         add_matchgroup(*x)
 
     group = "".join([escape_chargroup(x) for x in chargroups])
+    if len(chargroups) == 0:
+        raise RuntimeError("This shouldn't happen")
     return f"[{group}]"
 
 
@@ -128,9 +132,10 @@ class Segment:
     def with_alignment(self, alignment: Alignment) -> SegmentVariant:
         prefix_padding = alignment
         suffix_padding = 6 - ((len(self.bits) + alignment) % 6 or 6)
-        variant_bits = prefix_padding + suffix_padding
-        if variant_bits not in (0, 2, 4, 6):
-            raise RuntimeError(f"Math doesn't check out: {variant_bits}")
+        if prefix_padding not in (0, 2, 4) or suffix_padding not in (0, 2, 4):
+            raise RuntimeError(
+                f"Math doesn't check out: {prefix_padding=}, {suffix_padding=}"
+            )
 
         prefix_bits = (6 - prefix_padding) % 6
         prefix = self.bits[:prefix_bits] if prefix_bits else []
