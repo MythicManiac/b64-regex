@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "b64-regex"
 version = "0.1.0"
-description = ""
+description = "Search through b64 encoded text without decoding."
 authors = ["Mythic <mythicmaniac@gmail.com>"]
 license = "MIT"
 readme = "README.md"
