@@ -1,6 +1,6 @@
 # Base64 Regex
 
-Regex for base64
+Search through base64 encoding without decoding.
 
 ## Usage
 
@@ -32,7 +32,7 @@ end_segment = Segment(b")patternSuffix")
 full_regex = f"{start_segment.as_regex()}{B64_CHARGROUP}+{end_segment.as_regex()}"
 
 # Output:
-# (?:cGF0dGVyblByZWZpeC[g-j]|[HXn3]BhdHRlcm5QcmVmaXgo|[BFJNRVZdhlptx159]wYXR0ZXJuUHJlZml4K[A-P])[a-zA-Z0-9\/\+]+(?:KXBhdHRlcm5TdWZmaX[g-j]|[CSiy]lwYXR0ZXJuU3VmZml4|[Acgkosw048]pcGF0dGVyblN1ZmZpe[A-P])
+# (?:cGF0dGVyblByZWZpeC[g-j]|[HXn3]BhdHRlcm5QcmVmaXgo|[BFJNRVZdhlptx159]wYXR0ZXJuUHJlZml4K[A-P])[a-zA-Z0-9\/\+]+(?:KXBhdHRlcm5TdWZmaX[g-j]|[CSiy]lwYXR0ZXJuU3VmZml4|[AEIMQUYcgkosw048]pcGF0dGVyblN1ZmZpe[A-P])
 ```
 
 ### Decoding matches

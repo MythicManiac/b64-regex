@@ -37,7 +37,9 @@ class GroupBuilder:
 
     def add(self, current: int) -> Iterable[Tuple[int, int]]:
         group = is_in_group(current)
-        if group != self.current_group or (self.end and current > self.end + 1):
+        if group != self.current_group or (
+            self.end is not None and current > self.end + 1
+        ):
             for x in self.reset_cursor():
                 yield x
 
@@ -132,7 +134,7 @@ class Segment:
     def with_alignment(self, alignment: Alignment) -> SegmentVariant:
         prefix_padding = alignment
         suffix_padding = 6 - ((len(self.bits) + alignment) % 6 or 6)
-        if prefix_padding not in (0, 2, 4) or suffix_padding not in (0, 2, 4):
+        if prefix_padding not in ALL_ALIGNMENTS or suffix_padding not in ALL_ALIGNMENTS:
             raise RuntimeError(
                 f"Math doesn't check out: {prefix_padding=}, {suffix_padding=}"
             )
