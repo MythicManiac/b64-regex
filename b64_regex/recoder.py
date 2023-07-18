@@ -192,8 +192,24 @@ def add_b64_padding(encoded: str) -> str:
     return encoded
 
 
+def bits_to_bytes(bits: str) -> bytes:
+    return bytes(int(x, 2) for x in iter_windows(8, bits) if len(x) == 8)
+
+
 def base64_decode(content: str) -> bytes:
     stripped = content.replace("=", "")
     token_bytes = [CHARSET_REVERSE[x] for x in stripped]
     bits = "".join(f"{x:06b}" for x in token_bytes)
-    return bytes(int(x, 2) for x in iter_windows(8, bits) if len(x) == 8)
+    return bits_to_bytes(bits)
+
+
+def decode_all_alignments(encoded: str) -> List[bytes]:
+    stripped = encoded.replace("=", "")
+    token_bytes = [CHARSET_REVERSE[x] for x in stripped]
+    bits = "".join(f"{x:06b}" for x in token_bytes)
+    result = []
+    for prefix_bits in (0, 6, 12):
+        prefix = "0" * prefix_bits
+        decoded = bits_to_bytes(f"{prefix}{bits}")[prefix_bits // 6 :]
+        result.append(decoded)
+    return result
