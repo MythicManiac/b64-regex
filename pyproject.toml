@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "b64-regex"
-version = "0.1.1"
+version = "0.1.2"
 description = "Build regex patterns for searching through b64 encoded text without decoding."
 repository = "https://github.com/MythicManiac/b64-regex"
 homepage = "https://github.com/MythicManiac/b64-regex"
