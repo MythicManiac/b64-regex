@@ -37,7 +37,7 @@ full_regex = f"{start_segment.as_regex()}{B64_CHARGROUP}+{end_segment.as_regex()
 
 ### Decoding matches
 
-As around 33% of the matches are going to be misaligned by 6 or 12 bits,
+As around 33% of the matches are going to be misaligned by 2 or 4 bits,
 decoding might need the prefixing of one or two b64 tokens to yield the right
 results.
 

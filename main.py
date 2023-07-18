@@ -41,19 +41,13 @@ def main():
     # dump_flags_to_txt("./test.txt")
     # dump_test_flags_to_file("./test.csv")
 
-    # start_seq = Segment(b"HTB{")
-    # end_seq = Segment(b"}")
-    #
-    # full_regex = (
-    #     "(" f"{start_seq.as_regex()}" f"{B64_CHARGROUP}+" f"{end_seq.as_regex()}" ")"
-    # )
-    # print(full_regex)
+    start_seq = Segment(b"HTB{")
+    end_seq = Segment(b"}")
 
-    from b64_regex.recoder import decode_all_alignments
-
-    match = "HBhdHRlcm5QcmVmaXgoZm9vLWJhci1jb250ZW50YWFhYWFhKXBhdHRlcm5TdWZmaXh"
-    for x in decode_all_alignments(match):
-        print(x)
+    full_regex = (
+        "(" f"{start_seq.as_regex()}" f"{B64_CHARGROUP}+" f"{end_seq.as_regex()}" ")"
+    )
+    print(full_regex)
 
 
 if __name__ == "__main__":
