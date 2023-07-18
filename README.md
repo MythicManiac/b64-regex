@@ -1,5 +1,10 @@
 # Base64 Regex
 
+[![pypi](https://img.shields.io/pypi/v/b64-regex)](https://pypi.org/project/b64-regex/)
+[![test](https://github.com/MythicManiac/b64-regex/workflows/Test/badge.svg)](https://github.com/MythicManiac/b64-regex/actions)
+[![codecov](https://codecov.io/gh/MythicManiac/b64-regex/branch/master/graph/badge.svg?token=6lS3pEHvIw)](https://codecov.io/gh/MythicManiac/b64-regex)
+[![python-versions](https://img.shields.io/pypi/pyversions/b64-regex.svg)](https://pypi.org/project/b64-regex/)
+
 Search through base64 encoding without decoding.
 
 ## Usage

@@ -1,14 +1,18 @@
 [tool.poetry]
 name = "b64-regex"
 version = "0.1.0"
-description = "Search through b64 encoded text without decoding."
-authors = ["Mythic <mythicmaniac@gmail.com>"]
+description = "Build regex patterns for search through b64 encoded text without decoding."
+repository = "https://github.com/MythicManiac/b64-regex"
+homepage = "https://github.com/MythicManiac/b64-regex"
+authors = ["Mythic <mythic@thunderstore.io>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "b64_regex"}]
+packages = [
+    { include = "b64_regex" }
+]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.8"
 
 
 [tool.poetry.group.dev.dependencies]
