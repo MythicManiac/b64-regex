@@ -215,8 +215,9 @@ def decode_all_alignments(encoded: str) -> List[bytes]:
     token_bytes = [CHARSET_REVERSE[x] for x in stripped]
     bits = "".join(f"{x:06b}" for x in token_bytes)
     result = []
-    for prefix_bits in (0, 6, 12, 18):
-        prefix = "0" * prefix_bits
-        decoded = bits_to_bytes(f"{prefix}{bits}")[prefix_bits // 6 :]
+
+    for prefix_bits in (0, 2, 4):
+        decoded = bits_to_bytes(f"{bits[prefix_bits:]}")
+        # print(bits)
         result.append(decoded)
     return result

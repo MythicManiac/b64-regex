@@ -49,14 +49,11 @@ def main():
     # )
     # print(full_regex)
 
-    start_segment = Segment(b"patternPrefix(")
-    end_segment = Segment(b")patternSuffix")
+    from b64_regex.recoder import decode_all_alignments
 
-    full_regex = f"{start_segment.as_regex()}{B64_CHARGROUP}+{end_segment.as_regex()}"
-    print(full_regex)
-
-    segment = Segment(b"string-to-search")
-    print(segment.as_regex())
+    match = "HBhdHRlcm5QcmVmaXgoZm9vLWJhci1jb250ZW50YWFhYWFhKXBhdHRlcm5TdWZmaXh"
+    for x in decode_all_alignments(match):
+        print(x)
 
 
 if __name__ == "__main__":
