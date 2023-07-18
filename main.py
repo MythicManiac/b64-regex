@@ -2,10 +2,7 @@ from base64 import b64encode
 from csv import DictWriter
 
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
-from b64_regex.recoder import (
-    Segment,
-    bytes_to_bits,
-)
+from b64_regex.recoder import Segment
 
 
 def dump_test_flags_to_csv(destination: str):
