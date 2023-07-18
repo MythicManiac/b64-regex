@@ -1,6 +1,7 @@
 from base64 import b64encode
 from csv import DictWriter
 
+from b64_regex.compiler import make_alignment_variants
 from b64_regex.generate_test import generate_flags, wrap_with_random_text
 
 
@@ -27,8 +28,13 @@ def print_test_flags():
         print(f"{flag=} | {wrapped=} | {encoded=}")
 
 
+def build_regex():
+    print(make_alignment_variants("HTB{"))
+
+
 def main():
-    dump_test_flags_to_file("./test.csv")
+    # dump_test_flags_to_file("./test.csv")
+    build_regex()
 
 
 if __name__ == "__main__":
